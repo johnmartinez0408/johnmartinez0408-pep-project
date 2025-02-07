@@ -6,6 +6,9 @@ import io.javalin.Javalin;
 import io.javalin.http.Context;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import javax.management.InvalidAttributeValueException;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import Model.Account;
@@ -40,6 +43,7 @@ public class SocialMediaController {
         app.post("/register", this::addAccountHandler);
 
         //Process login
+        app.post("/login", this::loginHandler);
 
         //Create message
 
@@ -68,13 +72,29 @@ public class SocialMediaController {
     //Register new account
     private void addAccountHandler(Context context) throws JsonProcessingException{
         ObjectMapper om = new ObjectMapper();
-        Account acc = om.readValue(context.body(), Account.class);
-        if(acc!=null){
-            context.json(om.writeValueAsString(acc));
+        Account account = om.readValue(context.body(), Account.class);
+       
+        try{
+            accountService.addAccount(account);
+            context.json(om.writeValueAsString(account));
             context.status(200);
-        }else{
+        }catch(InvalidAttributeValueException e){ //Exception when username is null, pw is less than 4 chars, etc
+            e.printStackTrace();
             context.status(400);
         }
+
     }
 
+    //Handle login attempt
+    private void loginHandler(Context context) throws JsonProcessingException{
+        ObjectMapper om = new ObjectMapper();
+        Account account = om.readValue(context.body(), Account.class);
+        Account loggedInAccount = accountService.loginToAccount(account);
+        context.json(om.writeValueAsString(account));
+        if(loggedInAccount != null){
+            context.status(200);
+        }else{
+            context.status(401);
+        }
+    }
 }
