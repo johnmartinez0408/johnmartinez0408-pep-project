@@ -57,7 +57,7 @@ public class SocialMediaController {
 
         //Get messages by specified author
 
-        app.start(8080);
+        // app.start(8080);
         return app;
     }
 
@@ -90,8 +90,9 @@ public class SocialMediaController {
         ObjectMapper om = new ObjectMapper();
         Account account = om.readValue(context.body(), Account.class);
         Account loggedInAccount = accountService.loginToAccount(account);
-        context.json(om.writeValueAsString(account));
+        
         if(loggedInAccount != null){
+            context.json(om.writeValueAsString(account));
             context.status(200);
         }else{
             context.status(401);

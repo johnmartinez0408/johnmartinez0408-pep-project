@@ -17,7 +17,7 @@ public class AccountService {
     //Register Account
     public Account addAccount(Account account) throws InvalidAttributeValueException{
         //Validate parameters
-        if(account.getUsername() == null || account.getPassword().length()<4){
+        if(account.getUsername() == null || account.getPassword().length()<4 || account.getUsername().equals("")){
             throw new InvalidAttributeValueException("Invalid data provided for adding an account from MessageService");
         }
 

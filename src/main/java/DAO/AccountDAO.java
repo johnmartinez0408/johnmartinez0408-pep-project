@@ -20,12 +20,9 @@ public class AccountDAO {
         Connection conn = ConnectionUtil.getConnection();
         
         try{
-
             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-
             ps.setString(1, account.getUsername());
             ps.setString(2, account.getPassword());
-           
             ps.executeUpdate();
            
             ResultSet rs= ps.getGeneratedKeys();
