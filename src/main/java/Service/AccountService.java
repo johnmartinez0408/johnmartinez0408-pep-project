@@ -16,15 +16,13 @@ public class AccountService {
 
     //Register Account
     public Account addAccount(Account account) throws InvalidAttributeValueException{
+        
+        Account existingAccountInDb = accountDAO.getAccountByUsername(account.username);
+        
         //Validate parameters
-        if(account.getUsername() == null || account.getPassword().length()<4 || account.getUsername().equals("")){
+        if(existingAccountInDb!=null || account.getUsername() == null || account.getPassword().length()<4 || account.getUsername().equals("")){
             throw new InvalidAttributeValueException("Invalid data provided for adding an account from MessageService");
         }
-
-        //TODO verify that user isn't already in db
-        // if(false){
-        //     return null;
-        // }
 
         return accountDAO.addAccount(account);
     }
@@ -33,6 +31,11 @@ public class AccountService {
     //Process login
     public Account loginToAccount(Account account){
         return accountDAO.loginToAccount(account);
+    }
+
+    //Checks if account with specified accountId is present in database
+    public boolean accountExists(int accountId){
+        return accountDAO.accountExists(accountId);
     }
 
 }

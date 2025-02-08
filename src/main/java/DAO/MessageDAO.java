@@ -2,7 +2,7 @@ package DAO;
 
 import Util.ConnectionUtil;
 import java.util.List;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -44,11 +44,11 @@ public class MessageDAO {
     public List<Message> getAllMessages(){
         String sql = "SELECT * FROM message;";
         Connection conn = ConnectionUtil.getConnection();
-        
+        List<Message> messages = new ArrayList<Message>();
         try{
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
-            List<Message> messages = new LinkedList<Message>();
+            
             while(rs.next()){
                 Message m = new Message();
                 m.setMessage_id(rs.getInt("message_id"));
@@ -61,7 +61,7 @@ public class MessageDAO {
 
         }catch(SQLException e){
             e.printStackTrace();
-            return null;
+            return messages;
         }
     }
 
@@ -111,12 +111,13 @@ public class MessageDAO {
     }
 
     //Update message by id
-    public boolean updateMessageById(int messageId){
+    public boolean updateMessageById(int messageId, String messageText){
         String sql = "UPDATE message SET message_text=? WHERE message_id=?";
         Connection conn = ConnectionUtil.getConnection();
         try{
             PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, messageId);
+            ps.setString(1, messageText);
+            ps.setInt(2, messageId);
             int rowsUpdated = ps.executeUpdate();
             if(rowsUpdated>0){
                 return true;
@@ -134,18 +135,24 @@ public class MessageDAO {
     public List<Message> getMessagesByAccount(int accountId){
         String sql = "SELECT * FROM message WHERE posted_by = ?";
         Connection conn = ConnectionUtil.getConnection();
+        List<Message> messages = new ArrayList<Message>();
         try{
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, accountId);
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
-
+                Message m = new Message();
+                m.setPosted_by(accountId);
+                m.setMessage_id(rs.getInt("message_id"));
+                m.setMessage_text(rs.getString("message_text"));
+                m.setTime_posted_epoch(rs.getLong("time_posted_epoch"));
+                messages.add(m);
             }
+            return messages;
             
         }catch(SQLException e){
             e.printStackTrace();
-            return null;
+            return messages;
         }
-        return null;
     }
 }
